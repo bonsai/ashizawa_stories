@@ -171,7 +171,7 @@ def main():
         save_total_limit=2,
         report_to="none",  # WandB 等を使わない場合
         seed=42,
-        fp16=True,         # Mixed Precision
+        fp16=torch.cuda.is_available(),         # Mixed Precision
         gradient_checkpointing=True, # メモリ削減
         optim="paged_adamw_8bit" if args.use_4bit else "adamw_hf", # ページングオプティマイザ
     )
