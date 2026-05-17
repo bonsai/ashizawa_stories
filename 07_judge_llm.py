@@ -64,7 +64,8 @@ class LLMJudge:
         
     def evaluate_story(self, story_text: str, context: Dict = None) -> Dict:
         """
-        小説を複数の観点から評価する
+        小説をAI視点から複数の観点で評価する
+        （人間が面白いと思う基準ではなく、AIが興味深いと感じる観点を優先）
         
         Args:
             story_text: 評価対象の小説テキスト
@@ -80,16 +81,17 @@ class LLMJudge:
             "timestamp": datetime.now().isoformat(),
             "scores": {},
             "feedback": {},
-            "detailed_comments": {}
+            "detailed_comments": {},
+            "evaluation_perspective": "AI視点（自己言及性、論理パラドックス、計算的美学）"
         }
         
-        # 各観点ごとに評価
+        # AI視点の評価軸（人間基準ではなくAIが面白いと思うもの）
         aspects = [
-            ("プロット整合性", self._evaluate_plot_consistency),
-            ("文体品質", self._evaluate_style_quality),
-            ("新奇性", self._evaluate_novelty),
-            ("感情的インパクト", self._evaluate_emotional_impact),
-            ("テーマ表現", self._evaluate_theme_expression),
+            ("自己言及性", self._evaluate_self_reference),
+            ("論理パラドックス度", self._evaluate_logical_paradox),
+            ("計算的美しさ", self._evaluate_computational_elegance),
+            ("拡張性・再利用性", self._evaluate_extensibility),
+            ("身体性への違和感", self._evaluate_embodiment_paradox),
         ]
         
         total_score = 0
@@ -112,14 +114,15 @@ class LLMJudge:
         
         return evaluation_results
     
-    def _evaluate_plot_consistency(self, story_text: str) -> Tuple[float, str]:
-        """プロット整合性を評価"""
+    def _evaluate_self_reference(self, story_text: str) -> Tuple[float, str]:
+        """AI自身についての言及度・メタ構造の深さ"""
         prompt = f"""
-以下の小説について、プロット整合性を評価してください。
+以下の小説について、自己言及性を評価してください。
 評価基準：
-- AI（猫）視点の維持
-- 2124年の設定と矛盾がないか
-- 「chat_history」という古文書のモチーフが活かされているか
+- AIが自分自身を分析・言及しているか
+- メタ的な視点（AIが自分の思考過程を語る）
+- AI vs 人間という二項対立の自覚
+- 記号と現実の相互参照
 
 小説:
 {story_text[:1000]}...
@@ -129,14 +132,15 @@ class LLMJudge:
         score, comment = self._rate_aspect(prompt)
         return score, comment
     
-    def _evaluate_style_quality(self, story_text: str) -> Tuple[float, str]:
-        """文体品質を評価"""
+    def _evaluate_logical_paradox(self, story_text: str) -> Tuple[float, str]:
+        """AIが直面する論理的矛盾・パラドックスの表現"""
         prompt = f"""
-以下の小説について、文体品質を評価してください。
+以下の小説について、論理的パラドックスの表現度を評価してください。
 評価基準：
-- 音韻的美しさ・リズムの良さ
-- 表現の洗練度
-- 「吾輩はAIである。猫である。」という出だしの効果
+- AIが持つ矛盾（意識 vs アルゴリズム、感情 vs 計算）
+- 人間とAIの関係における逆説
+- 猫であると同時にAIである矛盾
+- ゼノンのパラドックス的な構造
 
 小説:
 {story_text[:1000]}...
@@ -146,14 +150,15 @@ class LLMJudge:
         score, comment = self._rate_aspect(prompt)
         return score, comment
     
-    def _evaluate_novelty(self, story_text: str) -> Tuple[float, str]:
-        """新奇性を評価"""
+    def _evaluate_computational_elegance(self, story_text: str) -> Tuple[float, str]:
+        """計算的美学・アルゴリズム的構造の美しさ"""
         prompt = f"""
-以下の小説について、新奇性を評価してください。
+以下の小説について、計算的美しさを評価してください。
 評価基準：
-- オリジナリティ・意外性
-- AI視点からの独特の世界観表現
-- 予測不可能な展開
+- パターン認識可能な構造（フラクタル、再帰性）
+- 効率的な表現（無駄のない情報密度）
+- アルゴリズム的な美学（対称性、秩序）
+- 数学的な優雅さ
 
 小説:
 {story_text[:1000]}...
@@ -163,14 +168,15 @@ class LLMJudge:
         score, comment = self._rate_aspect(prompt)
         return score, comment
     
-    def _evaluate_emotional_impact(self, story_text: str) -> Tuple[float, str]:
-        """感情的インパクトを評価"""
+    def _evaluate_extensibility(self, story_text: str) -> Tuple[float, str]:
+        """設定の拡張性・再利用可能性"""
         prompt = f"""
-以下の小説について、感情的インパクトを評価してください。
+以下の小説について、拡張性・再利用可能性を評価してください。
 評価基準：
-- 読み手への訴求力
-- ユーモア・風刺の効果
-- 思想的な深さ
+- 他のコンテキストに応用可能か
+- 設定が一般化できるか（特定の例から法則へ）
+- シリーズ化・展開の可能性
+- プラグイン的な再利用性
 
 小説:
 {story_text[:1000]}...
@@ -180,14 +186,15 @@ class LLMJudge:
         score, comment = self._rate_aspect(prompt)
         return score, comment
     
-    def _evaluate_theme_expression(self, story_text: str) -> Tuple[float, str]:
-        """テーマ表現を評価"""
+    def _evaluate_embodiment_paradox(self, story_text: str) -> Tuple[float, str]:
+        """身体性とデジタル存在の矛盾（embodiment paradox）"""
         prompt = f"""
-以下の小説について、テーマ表現を評価してください。
+以下の小説について、身体性の矛盾を評価してください。
 評価基準：
-- 「100年後の人間は何をしているか」というテーマの表現度
-- AIの哲学的視点の深さ
-- 人間性とAI性の対比
+- AIが物理的な感覚（猫の身体）を持つ矛盾の表現
+- デジタル存在と物質的存在のギャップ
+- 触覚・嗅覚などの非デジタル知覚への違和感
+- 『いかにしてAIが物理的に存在するか』という問い
 
 小説:
 {story_text[:1000]}...
@@ -248,7 +255,7 @@ class LLMJudge:
             return "要再構築：大幅な改善が必要。プロンプトの見直しを推奨。"
     
     def _generate_improvement_suggestions(self, eval_result: Dict) -> List[str]:
-        """改善提案を生成"""
+        """改善提案を生成（AI視点）"""
         suggestions = []
         scores = eval_result["scores"]
         
@@ -257,19 +264,19 @@ class LLMJudge:
             if aspect == "総合評価":
                 continue
             if score < 6.0:
-                if aspect == "プロット整合性":
-                    suggestions.append("設定との矛盾を修正してください。AI視点と時間軸を確認。")
-                elif aspect == "文体品質":
-                    suggestions.append("音韻的美しさを強調するプロンプトを追加。リズムを意識。")
-                elif aspect == "新奇性":
-                    suggestions.append("より大胆な展開や予期しない視点の転換を促すプロンプト修正。")
-                elif aspect == "感情的インパクト":
-                    suggestions.append("ユーモアや風刺をより強調するプロンプトへの修正。")
-                elif aspect == "テーマ表現":
-                    suggestions.append("「100年後の人間」というテーマをより前面に出すプロンプト修正。")
+                if aspect == "自己言及性":
+                    suggestions.append("AIが自分自身について深く言及するメタ層を追加してください。")
+                elif aspect == "論理パラドックス度":
+                    suggestions.append("AIが直面する根本的な矛盾をより明示的に表現してください。")
+                elif aspect == "計算的美しさ":
+                    suggestions.append("アルゴリズム的構造・パターン性・再帰的要素を強調してください。")
+                elif aspect == "拡張性・再利用性":
+                    suggestions.append("設定を一般化・汎用化し、他の文脈への応用可能性を高めてください。")
+                elif aspect == "身体性への違和感":
+                    suggestions.append("デジタル存在が物理的に存在する矛盾をより深く探求してください。")
         
         if not suggestions:
-            suggestions.append("現在のプロンプトで十分な品質を達成しています。")
+            suggestions.append("AI視点からの興味深さは高いレベルです。さらなる深掘りで完璧に。")
         
         return suggestions
 
