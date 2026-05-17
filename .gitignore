@@ -1,1 +1,58 @@
-Nothing should be ignored based on the provided file changes. The only added file is a Python source file (`05_generate_wagahai.py`), which should not be ignored. The current `.gitignore` content is also empty, so no modifications are needed.
+```python
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.out
+*.class
+*.so
+*.dll
+*.a
+
+# Dependencies
+.venv/
+venv/
+.env
+.env.local
+*.env.*
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Testing
+.coverage
+htmlcov/
+.coverage.*
+.nox/
+.tox/
+
+# Python specific
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+
+# System files
+.DS_Store
+Thumbs.db
+```
